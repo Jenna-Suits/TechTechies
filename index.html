@@ -11,15 +11,14 @@
         <div class="login-container">
             <h2>Login</h2>
      
-            <form method="POST" action="{{ url_for('login') }}">
+            <form method="GET" action="home.html">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" placeholder="Enter Username" required>
             
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" placeholder="Enter Password" required>
                 
-                <!-- <button type="submit" class="login-button">Submit</button> -->
-                <a href="Home.html">Submit</a>
+                <button type="submit" class="login-button">Submit</button> 
             </form>
      
             <div class="link-container">
