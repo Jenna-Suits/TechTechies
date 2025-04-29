@@ -62,47 +62,39 @@
 
     // 4) Fetch and render
     async function loadItems() {
-      
-      const itemsRef = collection(db, "products");
-      const q = query(itemsRef, where("ownerId", "==", userDocID));
-      try {
-        const snapshot = await getDocs(q);
+    // point at the subcollection under this user
+    const itemsRef = collection(db, "users", userDocID, "products");
 
-        if (snapshot.empty) {
-          itemsContainer.innerHTML = "<p>No items found.</p>";
-          return;
-        }
+    try {
+      const snapshot = await getDocs(itemsRef);
 
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          const card = document.createElement("div");
-          card.classList.add("item");
-          card.innerHTML = `
-            <a class="three-dots" href="editItem.html?id=${doc.id}">&#8942;</a>
-            <img
-              src="${data.imageURL || 'https://via.placeholder.com/150'}"
-              alt="${data.name}"
-              class="item-image"
-            />
-            <div class="item-info">
-              <h3>Name: ${data.name}</h3>
-              <h3>Quantity: ${data.quantity}</h3>
-            </div>
-            <div class="item-extra-info">
-              <h4>Serial Number: ${data.serialNumber}</h4>
-              <h4>Expiration Date: ${data.expirationDate}</h4>
-            </div>
-          `;
-          itemsContainer.appendChild(card);
-        });
-      } catch (err) {
-        console.error("Error loading items:", err);
-        itemsContainer.innerHTML = "<p>Unable to load items. Try again later.</p>";
+      if (snapshot.empty) {
+        itemsContainer.innerHTML = "<p>No items found.</p>";
+        return;
       }
-    }
 
-    // kick it off
-    loadItems();
-  </script>
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const card = document.createElement("div");
+        card.classList.add("item");
+        card.innerHTML = `
+          <a class="three-dots" href="editItem.html?id=${doc.id}">&#8942;</a>
+          <div class="item-info">
+            <h3>${data.productName}</h3>
+            <p>Stock: ${data.stock}</p>
+            <p>Reorder Level: ${data.reorderLevel}</p>
+            <p>Expiration: ${data.expirationDate}</p>
+          </div>
+        `;
+        itemsContainer.appendChild(card);
+      });
+    } catch (err) {
+      console.error("Error loading items:", err);
+      itemsContainer.innerHTML = "<p>Unable to load items. Try again later.</p>";
+    }
+  }
+
+  loadItems();
+</script>
 </body>
 </html>
