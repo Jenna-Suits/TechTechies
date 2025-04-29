@@ -4,10 +4,8 @@
       { "src": "index.py", "use": "@vercel/python" }
     ],
     "routes": [
-
-      { "src": "/(.*\\.(js|css|html|png|jpg))", "dest": "public/$1" },
-  
-
-      { "src": "/(.*)",               "dest": "index.py" }
+      { "src": "/api/(.*)",        "dest": "/index.py" },
+      { "src": "/(.*\\.(js|css|html|png|jpg))", "dest": "/public/$1" },
+      { "src": "/(.*)",            "dest": "/index.py" }
     ]
   }
