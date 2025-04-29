@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="WebsiteStyle.css" />
+  <title>TT – Add New</title>
+</head>
+<body class="main-page">
+  <div class="sidebar">
+    <h2 class="logo">TT</h2>
+    <a href="home.html">Home</a>
+    <a href="search.html">Search</a>
+    <a href="labels.html">Labels</a>
+    <a href="settings.html">Settings</a>
+  </div>
+
+  <div class="main-content">
+    <header>
+      <h1>ADD NEW ITEM</h1>
+      <div class="header-buttons">
+        <a href="printReport.html"><button>Print Report</button></a>
+        <a href="addNew.html"><button>+ Add New</button></a>
+      </div>
+    </header>
+
+    <div class="add-item-container">
+      <form id="addItemForm" class="add-item-form">
+        <label for="brand">Brand:</label>
+        <input type="text" id="brand" name="brand" required>
+
+        <label for="category">Category:</label>
+        <input type="text" id="category" name="category" required>
+
+        <label for="cost-price">Cost Price:</label>
+        <input type="number" id="cost-price" name="cost-price" step="0.01" required>
+
+        <label for="expiration-date">Expiration Date:</label>
+        <input type="date" id="expiration-date" name="expiration-date" required>
+
+        <label for="product-id">Product ID:</label>
+        <input type="text" id="product-id" name="product-id" required>
+
+        <label for="product-name">Product Name:</label>
+        <input type="text" id="product-name" name="product-name" required>
+
+        <label for="reorder-level">Reorder Level:</label>
+        <input type="number" id="reorder-level" name="reorder-level" required>
+
+        <label for="sales-count">Sales Count:</label>
+        <input type="number" id="sales-count" name="sales-count" required>
+
+        <label for="selling-price">Selling Price:</label>
+        <input type="number" id="selling-price" name="selling-price" step="0.01" required>
+
+        <label for="stock">Stock:</label>
+        <input type="number" id="stock" name="stock" required>
+
+        <label for="total-revenue">Total Revenue:</label>
+        <input type="number" id="total-revenue" name="total-revenue" step="0.01" required>
+
+        <label for="volume">Volume:</label>
+        <input type="number" id="volume" name="volume" required>
+
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc
+    } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+
+    // —             your Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBq1sDbh4Lb2jLZjWFCYf_JLdGctuP7BTU",
+      authDomain: "techtechies-e3517.firebaseapp.com",
+      projectId: "techtechies-e3517",
+      storageBucket: "techtechies-e3517.appspot.com",
+      messagingSenderId: "125355017903",
+      appId: "1:125355017903:web:8eb6990418437010a7765a"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+
+    // get logged-in user
+    const userDocID = localStorage.getItem("userDocID");
+    if (!userDocID) {
+      window.location.href = "index.html";
+    }
+
+    const form = document.getElementById("addItemForm");
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+
+      const data = {
+        brand:           form["brand"].value.trim(),
+        category:        form["category"].value.trim(),
+        costPrice:       parseFloat(form["cost-price"].value),
+        expirationDate:  form["expiration-date"].value,
+        productID:       form["product-id"].value.trim(),
+        productName:     form["product-name"].value.trim(),
+        reorderLevel:    parseInt(form["reorder-level"].value, 10),
+        salesCount:      parseInt(form["sales-count"].value, 10),
+        sellingPrice:    parseFloat(form["selling-price"].value),
+        stock:           parseInt(form["stock"].value, 10),
+        totalRevenue:    parseFloat(form["total-revenue"].value),
+        volume:          parseInt(form["volume"].value, 10),
+        createdAt:       new Date().toISOString()
+      };
+
+      try {
+        await addDoc(
+          collection(db, "users", userDocID, "products"),
+          data
+        );
+        // back to home when done
+        window.location.href = "home.html";
+      } catch (err) {
+        console.error("Error adding product:", err);
+        alert("Could not add item. Please try again.");
+      }
+    });
+  </script>
+</body>
+</html>
