@@ -54,25 +54,25 @@
     const app = initializeApp(firebaseConfig);
     const db  = getFirestore(app);
 
-    // grab current user
+    
     const userDocID = localStorage.getItem("userDocID");
     if (!userDocID) {
       window.location.href = "index.html";
     }
 
-    // helper: fetch all products for this user
+    
     async function fetchProducts() {
       const snap = await getDocs(collection(db, "users", userDocID, "products"));
       return snap.docs.map(d => ({ id: d.id, ...d.data() }));
     }
 
-    // helper: fetch the user’s settings doc
+    
     async function fetchUserSettings() {
       const snap = await getDoc(doc(db, "users", userDocID));
       return snap.exists() ? snap.data() : {};
     }
 
-    // build and trigger CSV download
+    
     function downloadCSV(rows, filename) {
       if (!rows.length) {
         alert("No data to download.");
@@ -98,7 +98,7 @@
       URL.revokeObjectURL(url);
     }
 
-    // report functions
+    
     async function lowStockReport() {
       const [products, settings] = await Promise.all([fetchProducts(), fetchUserSettings()]);
       const threshold = settings.lowStockLevel || 0;
@@ -117,7 +117,7 @@
       downloadCSV(products, "most_sold_report.csv");
     }
 
-    // wire up buttons after DOM is ready
+    
     document.getElementById("lowStockBtn").addEventListener("click", lowStockReport);
     document.getElementById("stockReportBtn").addEventListener("click", stockReport);
     document.getElementById("mostSoldBtn").addEventListener("click", mostSoldReport);

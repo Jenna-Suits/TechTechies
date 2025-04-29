@@ -56,7 +56,7 @@
       updateDoc
     } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-    // same config as your other pages
+    
     const firebaseConfig = {
       apiKey:      "AIzaSyBq1sDbh4Lb2jLZjWFCYf_JLdGctuP7BTU",
       authDomain:  "techtechies-e3517.firebaseapp.com",
@@ -68,13 +68,13 @@
     const app = initializeApp(firebaseConfig);
     const db  = getFirestore(app);
 
-    // grab userDocID or kick back to login
+    
     const userDocID = localStorage.getItem("userDocID");
     if (!userDocID) {
       window.location.href = "index.html";
     }
 
-    // element refs
+    
     const emailChk = document.getElementById("email-notifications");
     const smsChk   = document.getElementById("sms-notifications");
     const lowStock = document.getElementById("low-stock-level");
@@ -82,7 +82,7 @@
 
     const userRef = doc(db, "users", userDocID);
 
-    // on load: fetch existing settings
+    
     async function loadSettings() {
       try {
         const snap = await getDoc(userRef);
@@ -94,7 +94,7 @@
             lowStock.value = data.lowStockLevel;
           }
         } else {
-          // first-time user → you could set defaults here if you like
+          
           lowStock.value = 5;
         }
       } catch (err) {
@@ -103,7 +103,7 @@
       }
     }
 
-    // on click: write back
+    
     saveBtn.addEventListener("click", async () => {
       const payload = {
         emailNotifications: emailChk.checked,

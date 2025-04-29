@@ -47,7 +47,7 @@
       getDocs
     } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-    // same config as home.html
+    
     const firebaseConfig = {
       apiKey:      "AIzaSyBq1sDbh4Lb2jLZjWFCYf_JLdGctuP7BTU",
       authDomain:  "techtechies-e3517.firebaseapp.com",
@@ -59,7 +59,7 @@
     const app = initializeApp(firebaseConfig);
     const db  = getFirestore(app);
 
-    // must be logged in
+    
     const userDocID = localStorage.getItem("userDocID");
     if (!userDocID) {
       window.location.href = "index.html";
@@ -78,8 +78,7 @@
         return;
       }
 
-      // Firestore prefix‐match on productName (case‐sensitive in Firestore; we lowercase on client)
-      // so we fetch all then filter client‐side by lowercase includes:
+      
       const productsRef = collection(db, "users", userDocID, "products");
       try {
         const snap = await getDocs(productsRef);
@@ -96,7 +95,7 @@
           return;
         }
 
-        // render each match as a card
+        
         matches.forEach(item => {
           const card = document.createElement("div");
           card.classList.add("item");

@@ -75,7 +75,7 @@
       addDoc
     } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-    // —             your Firebase config
+    // config
     const firebaseConfig = {
       apiKey: "AIzaSyBq1sDbh4Lb2jLZjWFCYf_JLdGctuP7BTU",
       authDomain: "techtechies-e3517.firebaseapp.com",
@@ -87,7 +87,7 @@
     const app = initializeApp(firebaseConfig);
     const db  = getFirestore(app);
 
-    // get logged-in user
+    
     const userDocID = localStorage.getItem("userDocID");
     if (!userDocID) {
       window.location.href = "index.html";
@@ -118,7 +118,7 @@
           collection(db, "users", userDocID, "products"),
           data
         );
-        // back to home when done
+        
         window.location.href = "home.html";
       } catch (err) {
         console.error("Error adding product:", err);

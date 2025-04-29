@@ -76,7 +76,7 @@
       updateDoc
     } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-    // same config as home/addNew
+    // same config 
     const firebaseConfig = {
       apiKey:      "AIzaSyBq1sDbh4Lb2jLZjWFCYf_JLdGctuP7BTU",
       authDomain:  "techtechies-e3517.firebaseapp.com",
@@ -88,7 +88,7 @@
     const app = initializeApp(firebaseConfig);
     const db  = getFirestore(app);
 
-    // get userDocID & itemID
+    
     const userDocID = localStorage.getItem("userDocID");
     if (!userDocID) window.location.href = "index.html";
 
@@ -102,7 +102,7 @@
     const form = document.getElementById("editItemForm");
     const itemRef = doc(db, "users", userDocID, "products", itemID);
 
-    // 1) load existing data
+    
     async function loadItem() {
       try {
         const snap = await getDoc(itemRef);
@@ -127,7 +127,7 @@
       }
     }
 
-    // 2) on save, write updates
+   
     form.addEventListener("submit", async e => {
       e.preventDefault();
       try {

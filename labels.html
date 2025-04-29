@@ -27,12 +27,12 @@
     <main class="container">
       <div class="labels-container">
         <ul id="labels-list" class="labels-list">
-          <!-- category buttons go here -->
+          
         </ul>
       </div>
 
       <div id="category-results" class="container">
-        <!-- matching products will show here -->
+        
       </div>
     </main>
   </div>
@@ -65,14 +65,14 @@
     const resultsContainer = document.getElementById("category-results");
 
     async function loadLabels() {
-      // CLEAR the list first so we never accidentally append duplicates
+      
       labelsList.innerHTML = "";
 
       try {
         const productsRef = collection(db, "users", userDocID, "products");
         const snap = await getDocs(productsRef);
 
-        // use a Set to collect unique categories
+        
         const categories = new Set();
         snap.forEach(doc => {
           const data = doc.data();

@@ -24,12 +24,12 @@
       </div>
     </header>
 
-    <!-- this is where we'll inject the items -->
+    
     <main id="itemsContainer" class="container"></main>
   </div>
 
   <script type="module">
-    // 1) Firebase imports
+    
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
     import {
       getFirestore,
@@ -39,7 +39,7 @@
       getDocs
     } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-    // 2) Your config (fix storageBucket if needed)
+    // Your config 
     const firebaseConfig = {
       apiKey: "AIzaSyBq1sDbh4Lb2jLZjWFCYf_JLdGctuP7BTU",
       authDomain: "techtechies-e3517.firebaseapp.com",
@@ -51,18 +51,18 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // 3) Grab the logged-in user ID
+    
     const userDocID = localStorage.getItem("userDocID");
     if (!userDocID) {
-      // not logged in → back to login
+      
       window.location.href = "index.html";
     }
 
     const itemsContainer = document.getElementById("itemsContainer");
 
-    // 4) Fetch and render
+    
     async function loadItems() {
-    // point at the subcollection under this user
+    
     const itemsRef = collection(db, "users", userDocID, "products");
 
     try {
