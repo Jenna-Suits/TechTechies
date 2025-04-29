@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="WebsiteStyle.css" />
+  <title>TT – Edit Item</title>
+</head>
+<body class="main-page">
+  <div class="sidebar">
+    <h2 class="logo">TT</h2>
+    <a href="home.html">Home</a>
+    <a href="search.html">Search</a>
+    <a href="labels.html">Labels</a>
+    <a href="settings.html">Settings</a>
+  </div>
+
+  <div class="main-content">
+    <header>
+      <h1>EDIT ITEM</h1>
+      <div class="header-buttons">
+        <a href="printReport.html"><button>Print Report</button></a>
+        <a href="addNew.html"><button>+ Add New</button></a>
+      </div>
+    </header>
+
+    <main class="container add-item-container">
+      <form id="editItemForm">
+        <label for="productName">Name:</label>
+        <input type="text" id="productName" name="productName" required>
+
+        <label for="brand">Brand:</label>
+        <input type="text" id="brand" name="brand" required>
+
+        <label for="category">Category:</label>
+        <input type="text" id="category" name="category" required>
+
+        <label for="costPrice">Cost Price:</label>
+        <input type="number" id="costPrice" name="costPrice" step="0.01" required>
+
+        <label for="sellingPrice">Selling Price:</label>
+        <input type="number" id="sellingPrice" name="sellingPrice" step="0.01" required>
+
+        <label for="expirationDate">Expiration Date:</label>
+        <input type="date" id="expirationDate" name="expirationDate" required>
+
+        <label for="productID">Product ID:</label>
+        <input type="text" id="productID" name="productID" required>
+
+        <label for="reorderLevel">Reorder Level:</label>
+        <input type="number" id="reorderLevel" name="reorderLevel" required>
+
+        <label for="salesCount">Sales Count:</label>
+        <input type="number" id="salesCount" name="salesCount" required>
+
+        <label for="stock">Stock:</label>
+        <input type="number" id="stock" name="stock" required>
+
+        <label for="totalRevenue">Total Revenue:</label>
+        <input type="number" id="totalRevenue" name="totalRevenue" step="0.01" required>
+
+        <label for="volume">Volume:</label>
+        <input type="number" id="volume" name="volume" required>
+
+        <button type="submit">Save Changes</button>
+      </form>
+    </main>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      updateDoc
+    } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+
+    // same config as home/addNew
+    const firebaseConfig = {
+      apiKey:      "AIzaSyBq1sDbh4Lb2jLZjWFCYf_JLdGctuP7BTU",
+      authDomain:  "techtechies-e3517.firebaseapp.com",
+      projectId:   "techtechies-e3517",
+      storageBucket: "techtechies-e3517.appspot.com",
+      messagingSenderId: "125355017903",
+      appId:       "1:125355017903:web:8eb6990418437010a7765a"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+
+    // get userDocID & itemID
+    const userDocID = localStorage.getItem("userDocID");
+    if (!userDocID) window.location.href = "index.html";
+
+    const params = new URLSearchParams(window.location.search);
+    const itemID = params.get("id");
+    if (!itemID) {
+      alert("No item specified.");
+      window.location.href = "home.html";
+    }
+
+    const form = document.getElementById("editItemForm");
+    const itemRef = doc(db, "users", userDocID, "products", itemID);
+
+    // 1) load existing data
+    async function loadItem() {
+      try {
+        const snap = await getDoc(itemRef);
+        if (!snap.exists()) throw new Error("Item not found");
+        const d = snap.data();
+        form.productName.value   = d.productName;
+        form.brand.value         = d.brand;
+        form.category.value      = d.category;
+        form.costPrice.value     = d.costPrice;
+        form.sellingPrice.value  = d.sellingPrice;
+        form.expirationDate.value= d.expirationDate;
+        form.productID.value     = d.productID;
+        form.reorderLevel.value  = d.reorderLevel;
+        form.salesCount.value    = d.salesCount;
+        form.stock.value         = d.stock;
+        form.totalRevenue.value  = d.totalRevenue;
+        form.volume.value        = d.volume;
+      } catch (err) {
+        console.error(err);
+        alert("Could not load item.");
+        window.location.href = "home.html";
+      }
+    }
+
+    // 2) on save, write updates
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      try {
+        await updateDoc(itemRef, {
+          productName:  form.productName.value.trim(),
+          brand:        form.brand.value.trim(),
+          category:     form.category.value.trim(),
+          costPrice:    parseFloat(form.costPrice.value),
+          sellingPrice: parseFloat(form.sellingPrice.value),
+          expirationDate: form.expirationDate.value,
+          productID:    form.productID.value.trim(),
+          reorderLevel: parseInt(form.reorderLevel.value, 10),
+          salesCount:   parseInt(form.salesCount.value, 10),
+          stock:        parseInt(form.stock.value, 10),
+          totalRevenue: parseFloat(form.totalRevenue.value),
+          volume:       parseFloat(form.volume.value)
+        });
+        window.location.href = "home.html";
+      } catch (err) {
+        console.error("Update failed:", err);
+        alert("Error saving changes, please try again.");
+      }
+    });
+
+    loadItem();
+  </script>
+</body>
+</html>
