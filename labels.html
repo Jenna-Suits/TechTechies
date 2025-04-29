@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="WebsiteStyle.css" />
+  <title>TT – Labels</title>
+</head>
+<body class="main-page">
+  <div class="sidebar">
+    <h2 class="logo">TT</h2>
+    <a href="home.html">Home</a>
+    <a href="search.html">Search</a>
+    <a href="labels.html" class="active">Labels</a>
+    <a href="settings.html">Settings</a>
+  </div>
+
+  <div class="main-content">
+    <header>
+      <h1>LABELS</h1>
+      <div class="header-buttons">
+        <a href="printReport.html"><button>Print Report</button></a>
+        <a href="addNew.html"><button>+ Add New</button></a>
+      </div>
+    </header>
+
+    <main class="container labels-container">
+      <ul id="labels-list" class="labels-list">
+        <!-- categories will be injected here -->
+      </ul>
+    </main>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      getDocs
+    } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+
+    // same config as home/addNew/search
+    const firebaseConfig = {
+      apiKey:      "AIzaSyBq1sDbh4Lb2jLZjWFCYf_JLdGctuP7BTU",
+      authDomain:  "techtechies-e3517.firebaseapp.com",
+      projectId:   "techtechies-e3517",
+      storageBucket: "techtechies-e3517.appspot.com",
+      messagingSenderId: "125355017903",
+      appId:       "1:125355017903:web:8eb6990418437010a7765a"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+
+    // ensure logged in
+    const userDocID = localStorage.getItem("userDocID");
+    if (!userDocID) {
+      window.location.href = "index.html";
+    }
+
+    const labelsList = document.getElementById("labels-list");
+
+    async function loadLabels() {
+      try {
+        const productsRef = collection(db, "users", userDocID, "products");
+        const snap = await getDocs(productsRef);
+
+        // collect unique categories
+        const categories = new Set();
+        snap.forEach(doc => {
+          const data = doc.data();
+          if (data.category) {
+            categories.add(data.category);
+          }
+        });
+
+        if (categories.size === 0) {
+          labelsList.innerHTML = "<li>No categories found.</li>";
+          return;
+        }
+
+        // sort & render
+        Array.from(categories)
+          .sort((a, b) => a.localeCompare(b))
+          .forEach(cat => {
+            const li = document.createElement("li");
+            li.textContent = cat;
+            labelsList.appendChild(li);
+          });
+      } catch (err) {
+        console.error("Error loading labels:", err);
+        labelsList.innerHTML = "<li>Unable to load labels.</li>";
+      }
+    }
+
+    loadLabels();
+  </script>
+</body>
+</html>
