@@ -1,66 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="WebsiteStyle.css">
-    <title>TT</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="WebsiteStyle.css" />
+  <title>TT – Home</title>
 </head>
 <body class="main-page">
-    <div class="sidebar">
-        <h2 class="logo">TT</h2>
-        <a href="home.html">Home</a>
-        <a href="search.html">Search</a>
-        <a href="lables.html">Labels</a>
-        <a href="settings.html">Settings</a>
-    </div>
+  <div class="sidebar">
+    <h2 class="logo">TT</h2>
+    <a href="home.html">Home</a>
+    <a href="search.html">Search</a>
+    <a href="labels.html">Labels</a>
+    <a href="settings.html">Settings</a>
+  </div>
 
-    <div class="main-content">
-        <header>
-            <h1>HOME</h1>
-            <div class=" header-buttons">
-                <a href="printReport.html"><button>Print Report</button></a>
-                <a href="addNew.html"><button>+ Add New</button></a>
+  <div class="main-content">
+    <header>
+      <h1>HOME</h1>
+      <div class="header-buttons">
+        <a href="printReport.html"><button>Print Report</button></a>
+        <a href="addNew.html"><button>+ Add New</button></a>
+      </div>
+    </header>
+
+    <!-- this is where we'll inject the items -->
+    <main id="itemsContainer" class="container"></main>
+  </div>
+
+  <script type="module">
+    // 1) Firebase imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      query,
+      where,
+      getDocs
+    } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+
+    // 2) Your config (fix storageBucket if needed)
+    const firebaseConfig = {
+      apiKey: "AIzaSyBq1sDbh4Lb2jLZjWFCYf_JLdGctuP7BTU",
+      authDomain: "techtechies-e3517.firebaseapp.com",
+      projectId: "techtechies-e3517",
+      storageBucket: "techtechies-e3517.appspot.com",
+      messagingSenderId: "125355017903",
+      appId: "1:125355017903:web:8eb6990418437010a7765a"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // 3) Grab the logged-in user ID
+    const userDocID = localStorage.getItem("userDocID");
+    if (!userDocID) {
+      // not logged in → back to login
+      window.location.href = "index.html";
+    }
+
+    const itemsContainer = document.getElementById("itemsContainer");
+
+    // 4) Fetch and render
+    async function loadItems() {
+      
+      const itemsRef = collection(db, "products");
+      const q = query(itemsRef, where("ownerId", "==", userDocID));
+      try {
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+          itemsContainer.innerHTML = "<p>No items found.</p>";
+          return;
+        }
+
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const card = document.createElement("div");
+          card.classList.add("item");
+          card.innerHTML = `
+            <a class="three-dots" href="editItem.html?id=${doc.id}">&#8942;</a>
+            <img
+              src="${data.imageURL || 'https://via.placeholder.com/150'}"
+              alt="${data.name}"
+              class="item-image"
+            />
+            <div class="item-info">
+              <h3>Name: ${data.name}</h3>
+              <h3>Quantity: ${data.quantity}</h3>
             </div>
-        </header>
-    </div>
+            <div class="item-extra-info">
+              <h4>Serial Number: ${data.serialNumber}</h4>
+              <h4>Expiration Date: ${data.expirationDate}</h4>
+            </div>
+          `;
+          itemsContainer.appendChild(card);
+        });
+      } catch (err) {
+        console.error("Error loading items:", err);
+        itemsContainer.innerHTML = "<p>Unable to load items. Try again later.</p>";
+      }
+    }
+
+    // kick it off
+    loadItems();
+  </script>
 </body>
-<main class="container">
-    <div class="item">
-        <a class="three-dots" href="editItem.html">&#8942;</a>
-        <img src="https://via.placeholder.com/150" alt="Item 1" class="item-image">
-        <div class="item-info">
-            <h3>Name:</h3>
-            <h3>Quantity:</h3>
-        </div>
-        <div class="item-extra-info">
-            <h4>Serial Number: </h4>
-            <h4>Expiration Date: </h4>
-        </div>
-    </div>
-    <div class="item">
-        <a class="three-dots" href="/edititem?id={{ item.id }}">&#8942;</a>
-        <img src="https://via.placeholder.com/150" alt="Item 2" class="item-image">
-        <div class="item-info">
-            <h3>Name:</h3>
-            <h3>Quantity:</h3>
-        </div>
-        <div class="item-extra-info">
-            <h4>Serial Number: </h4>
-            <h4>Expiration Date: </h4>
-        </div>
-    </div>
-    <div class="item">
-        <a class="three-dots" href="/edititem?id={{ item.id }}">&#8942;</a>
-        <img src="https://via.placeholder.com/150" alt="Item 3" class="item-image">
-        <div class="item-info">
-            <h3>Name:</h3>
-            <h3>Quantity:</h3>
-        </div>
-        <div class="item-extra-info">
-            <h4>Serial Number: </h4>
-            <h4>Expiration Date: </h4>
-        </div>
-    </div>
-</main>
 </html>
