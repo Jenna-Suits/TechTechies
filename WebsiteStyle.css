@@ -167,10 +167,51 @@ header button:hover {
     cursor: pointer;
     width: 100%;
     font-size: 16px;
+    transition: 0.3s;
 }
 
 .add-item-form button:hover {
-    background: rgb(0, 204, 204);
+    transition: 0.3s;
+    background: rgb(2, 224, 224);
+}
+
+/* Edit an item buttons */
+.button-group {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  
+  .button-group button {
+    flex: 1;                
+    padding: 0.75rem 1rem;  
+    border: none;
+    border-radius: 4px;     
+    cursor: pointer;
+  }
+
+  #deleteButton, #saveButton {
+    font-weight: bold;
+    font-size: 16px;
+    transition: 0.3s;
+  }
+  
+  #deleteButton {
+    background-color: #e74c3c;
+    color: white;
+  }
+
+  #deleteButton:hover {
+    background-color: #c0392b;
+  }
+  
+  #saveButton {
+    background-color: #ccc;
+    color: #333;
+  }
+
+  #saveButton:hover {
+    background-color: #ddd;
 }
 
 /* container for print reports (print report page) */

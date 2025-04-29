@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="stylesheet" href="WebsiteStyle.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <title>TT – Edit Item</title>
 </head>
 <body class="main-page">
@@ -62,7 +63,10 @@
         <label for="volume">Volume:</label>
         <input type="number" id="volume" name="volume" required>
 
-        <button type="submit">Save Changes</button>
+        <div class="button-group">
+          <button type="button" id="deleteButton">Delete Item</button>
+          <button type="submit" id="saveButton">Save Changes</button>
+        </div>
       </form>
     </main>
   </div>
@@ -73,7 +77,8 @@
       getFirestore,
       doc,
       getDoc,
-      updateDoc
+      updateDoc,
+      deleteDoc
     } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
     // same config 
@@ -127,7 +132,29 @@
       }
     }
 
-   
+    document.getElementById("deleteButton").addEventListener("click", async () => {
+      const result = await Swal.fire({
+        title: "Delete Item",
+        text: "Are you sure you want to delete this item?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        iconColor: "#e74c3c",
+        confirmButtonColor: "#e74c3c",
+        cancelButtonColor: "#ccc"
+      });
+      if (result.isConfirmed) {
+        try {
+          await deleteDoc(itemRef);
+          window.location.href = "home.html";
+        } catch (err) {
+          console.error("Delete failed:", err);
+          Swal.fire("Error!", "Could not delete the item.", "error");
+        }
+      }
+    });
+
     form.addEventListener("submit", async e => {
       e.preventDefault();
       try {
