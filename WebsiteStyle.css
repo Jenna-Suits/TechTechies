@@ -120,8 +120,8 @@ header button:hover {
 .item-details {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    column-gap: 2.5rem;  
-    row-gap:    1rem;     
+    column-gap: 5rem;  
+    row-gap:    3rem;     
     margin-top: 1.5rem;   
     padding:    1rem;      
   }
