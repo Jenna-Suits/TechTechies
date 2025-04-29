@@ -266,9 +266,8 @@ header button:hover {
 /* Labels Page */
 .labels-container {
     max-width: 600px;
-    margin: 20px auto;
     margin-left:0;
-    text-align: center;
+    padding-left: 0;
 }
 
 .labels-list {
