@@ -78,16 +78,33 @@
         const card = document.createElement("div");
         card.classList.add("item");
         card.innerHTML = `
-          <a class="three-dots" href="editItem.html?id=${doc.id}">&#8942;</a>
-          <div class="item-info">
+            <a class="three-dots" href="editItem.html?id=${doc.id}">&#8942;</a>
+            <div class="item-info">
             <h3>${data.productName}</h3>
             <p>Stock: ${data.stock}</p>
-            <p>Reorder Level: ${data.reorderLevel}</p>
-            <p>Expiration: ${data.expirationDate}</p>
-          </div>
+            </div>
+
+            <div class="item-details" style="
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+                margin-top: 1rem;
+            ">
+            <div>
+                <p><strong>Brand:</strong> ${data.brand}</p>
+                <p><strong>Category:</strong> ${data.category}</p>
+                <p><strong>Expires:</strong> ${data.expirationDate}</p>
+                <p><strong>Product ID:</strong> ${data.productID}</p>
+            </div>
+            <div>
+                <p><strong>Stock:</strong> ${data.stock}</p>
+                <p><strong>Reorder Level:</strong> ${data.reorderLevel}</p>
+                <p><strong>Selling Price:</strong> $${data.sellingPrice}</p>
+            </div>
+            </div>
         `;
         itemsContainer.appendChild(card);
-      });
+        });
     } catch (err) {
       console.error("Error loading items:", err);
       itemsContainer.innerHTML = "<p>Unable to load items. Try again later.</p>";
