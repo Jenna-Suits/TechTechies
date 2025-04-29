@@ -1,60 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/Websitestyle.css') }}">
-    <title>TT</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="WebsiteStyle.css" />
+  <title>TT – Settings</title>
 </head>
-<body>
-    <div class="sidebar">
-        <h2 class="logo">TT</h2>
-        <a href="Home.html">Home</a>
-        <a href="Search.html">Search</a>
-        <a href="Lables.html">Labels</a>
-        <a href="Settings.html">Settings</a>
-    </div>
+<body class="main-page">
+  <div class="sidebar">
+    <h2 class="logo">TT</h2>
+    <a href="home.html">Home</a>
+    <a href="search.html">Search</a>
+    <a href="labels.html">Labels</a>
+    <a href="settings.html" class="active">Settings</a>
+  </div>
 
-    <div class="main-content">
-        <header>
-            <h1>SETTINGS</h1>
-            <div class=" header-buttons">
-                <a href="PrintReport.html"><button>Print Report</button></a>
-                <a href="AddNew.html"><button>+ Add New </button></a>
-            </div>
-        </header>
-        <div class="main-content">
-            
-            <div class="settings-container">
-                <h2>Notifications</h2>
-                <label>
-                    <input type="checkbox" id="email-notifications" checked>
-                    Enable Email Notifications
-                </label>
-                <br>
-                <label>
-                    <input type="checkbox" id="sms-notifications">
-                    Enable SMS Notifications
-                </label>
-                <br>
-    
-                <h2>Low Stock Notification</h2>
-                <label for="low-stock-level">Notify me when stock is below:</label>
-                <input type="number" id="low-stock-level" min="1" value="5" class="stock-input">
-    
-                <button onclick="saveSettings()" class="settings-button">Save Settings</button>
-            </div>
-        </div>
-    
-        <script>
-            function saveSettings() {
-                let emailNotifications = document.getElementById("email-notifications").checked;
-                let smsNotifications = document.getElementById("sms-notifications").checked;
-                let lowStockLevel = document.getElementById("low-stock-level").value;
-    
-                alert("Settings Saved:\nEmail Notifications: " + (emailNotifications ? "On" : "Off") + 
-                      "\nSMS Notifications: " + (smsNotifications ? "On" : "Off") + 
-                      "\nLow Stock Notification Level: " + lowStockLevel);
-            }
-        </script>
+  <div class="main-content">
+    <header>
+      <h1>SETTINGS</h1>
+      <div class="header-buttons">
+        <a href="printReport.html"><button>Print Report</button></a>
+        <a href="addNew.html"><button>+ Add New</button></a>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="settings-container">
+        <h2>Notifications</h2>
+        <label>
+          <input type="checkbox" id="email-notifications">
+          Enable Email Notifications
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" id="sms-notifications">
+          Enable SMS Notifications
+        </label>
+        <br>
+
+        <h2>Low Stock Notification</h2>
+        <label for="low-stock-level">Notify me when stock is below:</label>
+        <input type="number" id="low-stock-level" min="1" class="stock-input">
+
+        <button id="save-btn" class="settings-button">Save Settings</button>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      updateDoc
+    } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+
+    // same config as your other pages
+    const firebaseConfig = {
+      apiKey:      "AIzaSyBq1sDbh4Lb2jLZjWFCYf_JLdGctuP7BTU",
+      authDomain:  "techtechies-e3517.firebaseapp.com",
+      projectId:   "techtechies-e3517",
+      storageBucket: "techtechies-e3517.appspot.com",
+      messagingSenderId: "125355017903",
+      appId:       "1:125355017903:web:8eb6990418437010a7765a"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+
+    // grab userDocID or kick back to login
+    const userDocID = localStorage.getItem("userDocID");
+    if (!userDocID) {
+      window.location.href = "index.html";
+    }
+
+    // element refs
+    const emailChk = document.getElementById("email-notifications");
+    const smsChk   = document.getElementById("sms-notifications");
+    const lowStock = document.getElementById("low-stock-level");
+    const saveBtn  = document.getElementById("save-btn");
+
+    const userRef = doc(db, "users", userDocID);
+
+    // on load: fetch existing settings
+    async function loadSettings() {
+      try {
+        const snap = await getDoc(userRef);
+        if (snap.exists()) {
+          const data = snap.data();
+          emailChk.checked = !!data.emailNotifications;
+          smsChk.checked   = !!data.smsNotifications;
+          if (typeof data.lowStockLevel === "number") {
+            lowStock.value = data.lowStockLevel;
+          }
+        } else {
+          // first-time user → you could set defaults here if you like
+          lowStock.value = 5;
+        }
+      } catch (err) {
+        console.error("Failed to load settings:", err);
+        alert("Could not load settings. Try again later.");
+      }
+    }
+
+    // on click: write back
+    saveBtn.addEventListener("click", async () => {
+      const payload = {
+        emailNotifications: emailChk.checked,
+        smsNotifications:   smsChk.checked,
+        lowStockLevel:      parseInt(lowStock.value, 10) || 0
+      };
+
+      try {
+        await updateDoc(userRef, payload);
+        alert("Settings saved!");
+      } catch (err) {
+        console.error("Error saving settings:", err);
+        alert("Failed to save settings. Please try again.");
+      }
+    });
+
+    loadSettings();
+  </script>
 </body>
+</html>
