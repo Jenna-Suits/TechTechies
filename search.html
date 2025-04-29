@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="WebsiteStyle.css" />
+  <title>TT – Search</title>
+</head>
+<body class="main-page">
+  <div class="sidebar">
+    <h2 class="logo">TT</h2>
+    <a href="home.html">Home</a>
+    <a href="search.html" class="active">Search</a>
+    <a href="labels.html">Labels</a>
+    <a href="settings.html">Settings</a>
+  </div>
+
+  <div class="main-content">
+    <header>
+      <h1>SEARCH</h1>
+      <div class="header-buttons">
+        <a href="printReport.html"><button>Print Report</button></a>
+        <a href="addNew.html"><button>+ Add New</button></a>
+      </div>
+    </header>
+
+    <div class="search-container" style="margin:1rem 0;">
+      <input
+        type="text"
+        id="search-bar"
+        class="search-input"
+        placeholder="Search by product name"
+      />
+      <button id="search-btn" class="search-button">Search</button>
+    </div>
+
+    <main id="search-results" class="container"></main>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      query,
+      where,
+      getDocs
+    } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+
+    // same config as home.html
+    const firebaseConfig = {
+      apiKey:      "AIzaSyBq1sDbh4Lb2jLZjWFCYf_JLdGctuP7BTU",
+      authDomain:  "techtechies-e3517.firebaseapp.com",
+      projectId:   "techtechies-e3517",
+      storageBucket: "techtechies-e3517.appspot.com",
+      messagingSenderId: "125355017903",
+      appId:       "1:125355017903:web:8eb6990418437010a7765a"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+
+    // must be logged in
+    const userDocID = localStorage.getItem("userDocID");
+    if (!userDocID) {
+      window.location.href = "index.html";
+    }
+
+    const resultsContainer = document.getElementById("search-results");
+    const input = document.getElementById("search-bar");
+    const btn   = document.getElementById("search-btn");
+
+    btn.addEventListener("click", async () => {
+      const term = input.value.trim().toLowerCase();
+      resultsContainer.innerHTML = "";
+
+      if (!term) {
+        resultsContainer.innerHTML = "<p>Please enter a search term.</p>";
+        return;
+      }
+
+      // Firestore prefix‐match on productName (case‐sensitive in Firestore; we lowercase on client)
+      // so we fetch all then filter client‐side by lowercase includes:
+      const productsRef = collection(db, "users", userDocID, "products");
+      try {
+        const snap = await getDocs(productsRef);
+        const matches = [];
+        snap.forEach(doc => {
+          const data = doc.data();
+          if (data.productName.toLowerCase().includes(term)) {
+            matches.push({ id: doc.id, ...data });
+          }
+        });
+
+        if (matches.length === 0) {
+          resultsContainer.innerHTML = `<p>No products found for “${term}”.</p>`;
+          return;
+        }
+
+        // render each match as a card
+        matches.forEach(item => {
+          const card = document.createElement("div");
+          card.classList.add("item");
+          card.innerHTML = `
+            <a class="three-dots" href="editItem.html?id=${item.id}">&#8942;</a>
+            <img
+              src="${item.imageURL || 'https://via.placeholder.com/150'}"
+              alt="${item.productName}"
+              class="item-image"
+            />
+            <div class="item-info">
+              <h3>${item.productName}</h3>
+              <p>Stock: ${item.stock}</p>
+            </div>
+            <div class="item-details">
+              <div>
+                <p><strong>Brand:</strong> ${item.brand}</p>
+                <p><strong>Category:</strong> ${item.category}</p>
+                <p><strong>Expires:</strong> ${item.expirationDate}</p>
+                <p><strong>ID:</strong> ${item.productID}</p>
+              </div>
+              <div>
+                <p><strong>Reorder Level:</strong> ${item.reorderLevel}</p>
+                <p><strong>Selling Price:</strong> $${item.sellingPrice}</p>
+                <p><strong>Cost Price:</strong> $${item.costPrice}</p>
+                <p><strong>Total Revenue:</strong> $${item.totalRevenue}</p>
+              </div>
+            </div>
+          `;
+          resultsContainer.appendChild(card);
+        });
+      } catch (err) {
+        console.error("Search error:", err);
+        resultsContainer.innerHTML = "<p>Failed to search. Please try again.</p>";
+      }
+    });
+  </script>
+</body>
+</html>
