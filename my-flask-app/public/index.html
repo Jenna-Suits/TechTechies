@@ -1,30 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <link rel="stylesheet" href="WebsiteStyle.css">
-   <title>TT</title>
-   </head>
-    <body class="login-page">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <link rel="stylesheet" href="WebsiteStyle.css">
+  <title>Login</title>
+</head>
+<body class="login-page">
+  <div class="login-container">
+    <h2>Login</h2>
+    <!-- remove method/action, add id -->
+    <form id="loginForm">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username"
+             placeholder="Enter Username" required>
 
-        <div class="login-container">
-            <h2>Login</h2>
-     
-            <form method="GET" action="Home.html">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" placeholder="Enter Username" required>
-            
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="Enter Password" required>
-                
-                <button type="submit" class="login-button">Submit</button> 
-            </form>
-     
-            <div class="link-container">
-                <a href="Createaccount.html">Create an Account</a>
-            </div>
-        </div>
-    </body>
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password"
+             placeholder="Enter Password" required>
+
+      <button type="submit" class="login-button">Submit</button>
+    </form>
+    <div class="link-container">
+      <a href="Createaccount.html">Create an Account</a>
+    </div>
+  </div>
+
+  <!-- hook up your JS -->
+  <script src="app.js"></script>
+</body>
 </html>
-
