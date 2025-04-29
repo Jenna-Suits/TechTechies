@@ -19,11 +19,17 @@
     <header>
       <h1>PRINT REPORT</h1>
       <div class="header-buttons">
-        <button onclick="downloadLowStockReport()">Low Stock Report</button>
-        <button onclick="downloadStockReport()">Stock Report</button>
-        <button onclick="downloadMostSoldReport()">Most Sold Report</button>
+        <a href="addNew.html"><button>+ Add New</button></a>
       </div>
     </header>
+
+    <div class="report-buttons-wrapper">
+      <div class="report-buttons-container">
+        <button id="lowStockBtn">Low Stock Report</button>
+        <button id="stockReportBtn">Stock Report</button>
+        <button id="mostSoldBtn">Most Sold Report</button>
+      </div>
+    </div>
   </div>
 
   <script type="module">
@@ -36,7 +42,7 @@
       getDoc
     } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-    // your same firebaseConfig
+    // your Firebase config
     const firebaseConfig = {
       apiKey:      "AIzaSyBq1sDbh4Lb2jLZjWFCYf_JLdGctuP7BTU",
       authDomain:  "techtechies-e3517.firebaseapp.com",
@@ -48,68 +54,73 @@
     const app = initializeApp(firebaseConfig);
     const db  = getFirestore(app);
 
-    // get logged-in user
+    // grab current user
     const userDocID = localStorage.getItem("userDocID");
     if (!userDocID) {
       window.location.href = "index.html";
     }
 
-    // helper: fetch all products
+    // helper: fetch all products for this user
     async function fetchProducts() {
       const snap = await getDocs(collection(db, "users", userDocID, "products"));
-      return snap.docs.map(d => d.data());
+      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
     }
 
-    // helper: fetch user settings
+    // helper: fetch the user’s settings doc
     async function fetchUserSettings() {
       const snap = await getDoc(doc(db, "users", userDocID));
       return snap.exists() ? snap.data() : {};
     }
 
-    // helper: turn array of objects into CSV and download
+    // build and trigger CSV download
     function downloadCSV(rows, filename) {
       if (!rows.length) {
         alert("No data to download.");
         return;
       }
-      const header = Object.keys(rows[0]);
-      const csv = [
-        header.join(","),
-        ...rows.map(r => header.map(h => `"${(r[h] ?? "").toString().replace(/"/g, '""')}"`).join(","))
-      ].join("\r\n");
-
-      const blob = new Blob([csv], { type: "text/csv" });
+      const headers = Object.keys(rows[0]);
+      const csvLines = [
+        headers.join(","), 
+        ...rows.map(r =>
+          headers.map(h => 
+            `"${(r[h] ?? "").toString().replace(/"/g,'""')}"`
+          ).join(",")
+        )
+      ];
+      const blob = new Blob([csvLines.join("\r\n")], { type: "text/csv" });
       const url  = URL.createObjectURL(blob);
       const a    = document.createElement("a");
       a.href     = url;
       a.download = filename;
+      document.body.appendChild(a);
       a.click();
+      document.body.removeChild(a);
       URL.revokeObjectURL(url);
     }
 
-    // 1) Low Stock Report
-    async function downloadLowStockReport() {
-      const [products, settings] = await Promise.all([
-        fetchProducts(),
-        fetchUserSettings()
-      ]);
+    // report functions
+    async function lowStockReport() {
+      const [products, settings] = await Promise.all([fetchProducts(), fetchUserSettings()]);
       const threshold = settings.lowStockLevel || 0;
       const rows = products.filter(p => Number(p.stock) < threshold);
       downloadCSV(rows, "low_stock_report.csv");
     }
 
-    // 2) Stock Report (all products)
-    async function downloadStockReport() {
+    async function stockReport() {
       const products = await fetchProducts();
       downloadCSV(products, "stock_report.csv");
     }
 
-    // 3) Most Sold Report (sorted descending by salesCount)
-    async function downloadMostSoldReport() {
+    async function mostSoldReport() {
       const products = await fetchProducts();
-      products.sort((a, b) => (b.salesCount || 0) - (a.salesCount || 0));
+      products.sort((a, b) => (b.salesCount||0) - (a.salesCount||0));
       downloadCSV(products, "most_sold_report.csv");
     }
+
+    // wire up buttons after DOM is ready
+    document.getElementById("lowStockBtn").addEventListener("click", lowStockReport);
+    document.getElementById("stockReportBtn").addEventListener("click", stockReport);
+    document.getElementById("mostSoldBtn").addEventListener("click", mostSoldReport);
   </script>
 </body>
 </html>
