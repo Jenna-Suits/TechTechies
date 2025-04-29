@@ -1,23 +1,23 @@
 {
-    "name": "my-app",
-    "version": "1.0.0",
-    "main": "api/login.js",
-    "dependencies": {
-        "mongodb": "^5.9.2"
-    },
-    "description": "",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/Jenna-Suits/TechTechies.git"
-    },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
-    "bugs": {
-        "url": "https://github.com/Jenna-Suits/TechTechies/issues"
-    },
-    "homepage": "https://github.com/Jenna-Suits/TechTechies#readme"
+  "name": "techtechies",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jenna-Suits/TechTechies.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Jenna-Suits/TechTechies/issues"
+  },
+  "homepage": "https://github.com/Jenna-Suits/TechTechies#readme",
+  "dependencies": {
+    "firebase": "^11.6.1"
+  }
 }
