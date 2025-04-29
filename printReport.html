@@ -1,41 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="WebsiteStyle.css">
-    
-    <title>TT</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="WebsiteStyle.css" />
+  <title>TT – Print Reports</title>
 </head>
 <body class="print-reports-page">
-    <div class="sidebar">
-        <h2 class="logo">TT</h2>
-        <a href="home.html">Home</a>
-        <a href="search.html">Search</a>
-        <a href="labels.html">Labels</a>
-        <a href="settings.html">Settings</a>
-    </div>
+  <div class="sidebar">
+    <h2 class="logo">TT</h2>
+    <a href="home.html">Home</a>
+    <a href="search.html">Search</a>
+    <a href="labels.html">Labels</a>
+    <a href="settings.html">Settings</a>
+  </div>
 
-    <div class="main-content">
-        <header>
-            <h1>PRINT REPORT</h1>
-            <div class=" header-buttons">
-                <a href="printReport.html"><button>Print Report</button></a>
-                <a href="addNew.html"><button>+ Add New </button></a>
-            </div>
-        </header>
-    </div>
+  <div class="main-content">
+    <header>
+      <h1>PRINT REPORT</h1>
+      <div class="header-buttons">
+        <button onclick="downloadLowStockReport()">Low Stock Report</button>
+        <button onclick="downloadStockReport()">Stock Report</button>
+        <button onclick="downloadMostSoldReport()">Most Sold Report</button>
+      </div>
+    </header>
+  </div>
 
-    <div class="report-buttons-wrapper">
-        <div class="add-item-container">
-            <div class="report-buttons-container">
-                <a href="/lowStockReport.html"><button>Low Stock Report</button></a>
-                <a href="/stockReport.html"><button>Stock Report</button></a>
-                <a href="/mostSoldReport.html"><button>Most Sold / Least Sold Report</button></a>
-            </div>
-        </div>
-    </div>
-    
-    
-    
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      getDocs,
+      doc,
+      getDoc
+    } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+
+    // your same firebaseConfig
+    const firebaseConfig = {
+      apiKey:      "AIzaSyBq1sDbh4Lb2jLZjWFCYf_JLdGctuP7BTU",
+      authDomain:  "techtechies-e3517.firebaseapp.com",
+      projectId:   "techtechies-e3517",
+      storageBucket: "techtechies-e3517.appspot.com",
+      messagingSenderId: "125355017903",
+      appId:       "1:125355017903:web:8eb6990418437010a7765a"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+
+    // get logged-in user
+    const userDocID = localStorage.getItem("userDocID");
+    if (!userDocID) {
+      window.location.href = "index.html";
+    }
+
+    // helper: fetch all products
+    async function fetchProducts() {
+      const snap = await getDocs(collection(db, "users", userDocID, "products"));
+      return snap.docs.map(d => d.data());
+    }
+
+    // helper: fetch user settings
+    async function fetchUserSettings() {
+      const snap = await getDoc(doc(db, "users", userDocID));
+      return snap.exists() ? snap.data() : {};
+    }
+
+    // helper: turn array of objects into CSV and download
+    function downloadCSV(rows, filename) {
+      if (!rows.length) {
+        alert("No data to download.");
+        return;
+      }
+      const header = Object.keys(rows[0]);
+      const csv = [
+        header.join(","),
+        ...rows.map(r => header.map(h => `"${(r[h] ?? "").toString().replace(/"/g, '""')}"`).join(","))
+      ].join("\r\n");
+
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement("a");
+      a.href     = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // 1) Low Stock Report
+    async function downloadLowStockReport() {
+      const [products, settings] = await Promise.all([
+        fetchProducts(),
+        fetchUserSettings()
+      ]);
+      const threshold = settings.lowStockLevel || 0;
+      const rows = products.filter(p => Number(p.stock) < threshold);
+      downloadCSV(rows, "low_stock_report.csv");
+    }
+
+    // 2) Stock Report (all products)
+    async function downloadStockReport() {
+      const products = await fetchProducts();
+      downloadCSV(products, "stock_report.csv");
+    }
+
+    // 3) Most Sold Report (sorted descending by salesCount)
+    async function downloadMostSoldReport() {
+      const products = await fetchProducts();
+      products.sort((a, b) => (b.salesCount || 0) - (a.salesCount || 0));
+      downloadCSV(products, "most_sold_report.csv");
+    }
+  </script>
 </body>
+</html>
