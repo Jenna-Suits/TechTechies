@@ -24,10 +24,16 @@
       </div>
     </header>
 
-    <main class="container labels-container">
-      <ul id="labels-list" class="labels-list">
-        <!-- categories will be injected here -->
-      </ul>
+    <main class="container">
+      <div class="labels-container">
+        <ul id="labels-list" class="labels-list">
+          <!-- category buttons go here -->
+        </ul>
+      </div>
+
+      <div id="category-results" class="container">
+        <!-- matching products will show here -->
+      </div>
     </main>
   </div>
 
@@ -36,10 +42,11 @@
     import {
       getFirestore,
       collection,
-      getDocs
+      getDocs,
+      query,
+      where
     } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-    // same config as home/addNew/search
     const firebaseConfig = {
       apiKey:      "AIzaSyBq1sDbh4Lb2jLZjWFCYf_JLdGctuP7BTU",
       authDomain:  "techtechies-e3517.firebaseapp.com",
@@ -51,26 +58,25 @@
     const app = initializeApp(firebaseConfig);
     const db  = getFirestore(app);
 
-    // ensure logged in
     const userDocID = localStorage.getItem("userDocID");
-    if (!userDocID) {
-      window.location.href = "index.html";
-    }
+    if (!userDocID) window.location.href = "index.html";
 
-    const labelsList = document.getElementById("labels-list");
+    const labelsList       = document.getElementById("labels-list");
+    const resultsContainer = document.getElementById("category-results");
 
     async function loadLabels() {
+      // CLEAR the list first so we never accidentally append duplicates
+      labelsList.innerHTML = "";
+
       try {
         const productsRef = collection(db, "users", userDocID, "products");
         const snap = await getDocs(productsRef);
 
-        // collect unique categories
+        // use a Set to collect unique categories
         const categories = new Set();
         snap.forEach(doc => {
           const data = doc.data();
-          if (data.category) {
-            categories.add(data.category);
-          }
+          if (data.category) categories.add(data.category);
         });
 
         if (categories.size === 0) {
@@ -78,17 +84,70 @@
           return;
         }
 
-        // sort & render
         Array.from(categories)
           .sort((a, b) => a.localeCompare(b))
           .forEach(cat => {
-            const li = document.createElement("li");
-            li.textContent = cat;
+            const li  = document.createElement("li");
+            const btn = document.createElement("button");
+            btn.textContent = cat;
+            btn.classList.add("label-button");
+            btn.addEventListener("click", () => showCategory(cat));
+            li.appendChild(btn);
             labelsList.appendChild(li);
           });
       } catch (err) {
         console.error("Error loading labels:", err);
         labelsList.innerHTML = "<li>Unable to load labels.</li>";
+      }
+    }
+
+    async function showCategory(category) {
+      resultsContainer.innerHTML = ""; 
+      try {
+        const productsRef = collection(db, "users", userDocID, "products");
+        const q           = query(productsRef, where("category", "==", category));
+        const snap        = await getDocs(q);
+
+        if (snap.empty) {
+          resultsContainer.innerHTML = `<p>No products found in "${category}".</p>`;
+          return;
+        }
+
+        snap.forEach(doc => {
+          const item = doc.data();
+          const card = document.createElement("div");
+          card.classList.add("item");
+          card.innerHTML = `
+            <a class="three-dots" href="editItem.html?id=${doc.id}">&#8942;</a>
+            <img
+              src="${item.imageURL || 'https://via.placeholder.com/150'}"
+              alt="${item.productName}"
+              class="item-image"
+            />
+            <div class="item-info">
+              <h3>${item.productName}</h3>
+              <p>Stock: ${item.stock}</p>
+            </div>
+            <div class="item-details">
+              <div>
+                <p><strong>Brand:</strong> ${item.brand}</p>
+                <p><strong>Category:</strong> ${item.category}</p>
+                <p><strong>Expires:</strong> ${item.expirationDate}</p>
+                <p><strong>ID:</strong> ${item.productID}</p>
+              </div>
+              <div>
+                <p><strong>Reorder Level:</strong> ${item.reorderLevel}</p>
+                <p><strong>Selling Price:</strong> $${item.sellingPrice}</p>
+                <p><strong>Cost Price:</strong> $${item.costPrice}</p>
+                <p><strong>Total Revenue:</strong> $${item.totalRevenue}</p>
+              </div>
+            </div>
+          `;
+          resultsContainer.appendChild(card);
+        });
+      } catch (err) {
+        console.error("Error fetching category:", err);
+        resultsContainer.innerHTML = "<p>Failed to load products.</p>";
       }
     }
 
