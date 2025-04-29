@@ -4,6 +4,9 @@ from flask_pymongo import PyMongo
 from flask_cors import CORS
 from dotenv import load_dotenv
 
+@app.route('/api/ping')
+def ping():
+    return 'pong'
 # 1) Load .env
 load_dotenv()
 
