@@ -75,21 +75,21 @@
 
       snapshot.forEach(doc => {
         const data = doc.data();
+
+        const cat = data.category?.toLowerCase() || "";
+        const imgSrc = cat.includes("wine")
+        ? "images/WinePlaceHolder.jpg"
+        : "images/SpiritPlaceHolder.jpg";
+
         const card = document.createElement("div");
         card.classList.add("item");
         card.innerHTML = `
+            <img class="item-image" src="${imgSrc}" alt="${data.productName}" />
             <a class="three-dots" href="editItem.html?id=${doc.id}">&#8942;</a>
             <div class="item-info">
-            <h3>${data.productName}</h3>
-            <p>Stock: ${data.stock}</p>
+              <h3>${data.productName}</h3>
             </div>
-
-            <div class="item-details" style="
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 1rem;
-                margin-top: 1rem;
-            ">
+            <div class="item-details">
             <div>
                 <p><strong>Brand:</strong> ${data.brand}</p>
                 <p><strong>Category:</strong> ${data.category}</p>
