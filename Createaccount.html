@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="WebsiteStyle.css" />
+  <title>TT – Create Account</title>
+</head>
+<body class="create-account-page">
+  <div class="login-container">
+    <h2>Create an Account</h2>
+    <form id="createAccountForm">
+      <div class="name-fields">
+        <div class="input-group">
+          <label for="first-name">First Name</label>
+          <input type="text" id="first-name" placeholder="First Name" required/>
+        </div>
+        <div class="input-group">
+          <label for="last-name">Last Name</label>
+          <input type="text" id="last-name" placeholder="Last Name" required/>
+        </div>
+      </div>
+      <label for="phone">Phone Number</label>
+      <input type="tel" id="phone" placeholder="(000)-000-0000" required/>
+      <label for="username">Username</label>
+      <input type="text" id="username" placeholder="Choose Username" required/>
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Create Password" required/>
+      <button type="submit" class="login-button">Create Account</button>
+    </form>
+
+    <div class="link-container">
+      <a href="login.html">Already have an account? Login</a>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import { getAnalytics }     from "https://www.gstatic.com/firebasejs/9.22.1/firebase-analytics.js";
+    import {
+      getFirestore,
+      collection,
+      query,
+      where,
+      getDocs,
+      addDoc
+    } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+
+    // — Use your exact config here, same as in login.html
+    const firebaseConfig = {
+      apiKey: "AIzaSyBq1sDbh4Lb2jLZjWFCYf_JLdGctuP7BTU",
+      authDomain: "techtechies-e3517.firebaseapp.com",
+      projectId: "techtechies-e3517",
+      storageBucket: "techtechies-e3517.firebasestorage.app",
+      messagingSenderId: "125355017903",
+      appId: "1:125355017903:web:8eb6990418437010a7765a"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    getAnalytics(app);
+    const db = getFirestore(app);
+
+    const form = document.getElementById("createAccountForm");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const firstName = document.getElementById("first-name").value.trim();
+      const lastName  = document.getElementById("last-name").value.trim();
+      const phone     = document.getElementById("phone").value.trim();
+      const username  = document.getElementById("username").value.trim();
+      const password  = document.getElementById("password").value.trim();
+
+      // Optional: check for existing username
+      const usersRef = collection(db, "users");
+      const usernameQuery = query(usersRef, where("username", "==", username));
+      const existing = await getDocs(usernameQuery);
+      if (!existing.empty) {
+        alert("Username already taken. Please choose another.");
+        return;
+      }
+
+      try {
+        // Add new document to "users" collection
+        const docRef = await addDoc(usersRef, {
+          firstName,
+          lastName,
+          phone,
+          username,
+          password
+        });
+
+        // Save to localStorage just like login flow
+        localStorage.setItem("userDocID", docRef.id);
+        localStorage.setItem("username", username);
+
+        // Redirect to home
+        window.location.href = "home.html";
+      } catch (err) {
+        console.error("Error creating account:", err);
+        alert("Could not create account. Please try again later.");
+      }
+    });
+  </script>
+</body>
+</html>
