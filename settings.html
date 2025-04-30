@@ -43,6 +43,7 @@
         <input type="number" id="low-stock-level" min="1" class="stock-input">
 
         <button id="save-btn" class="settings-button">Save Settings</button>
+        <button id="logout-btn" class="login-button">Logout</button>
       </div>
     </main>
   </div>
@@ -74,6 +75,10 @@
       window.location.href = "index.html";
     }
 
+    document.getElementById("logout-btn").addEventListener("click", () => {
+      localStorage.clear();
+      window.location.href = "index.html";
+    });
     
     const emailChk = document.getElementById("email-notifications");
     const smsChk   = document.getElementById("sms-notifications");

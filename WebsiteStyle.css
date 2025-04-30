@@ -431,6 +431,13 @@ input {
     background-color: black;
     color: white;
 }
+.logout-btn{
+    background-color: black;
+    color: white;
+}
+.logout-btn:hover{
+    background-color: #ff0303;
+}
 .login-button:hover{
     background-color: #0056b3;
 }
