@@ -77,9 +77,20 @@
         const data = doc.data();
 
         const cat = data.category?.toLowerCase() || "";
-        const imgSrc = cat.includes("wine")
-        ? "images/WinePlaceHolder.jpg"
-        : "images/SpiritPlaceHolder.jpg";
+
+        const choices = [
+          ["wine", "images/WinePlaceHolder.jpg"],
+          ["gin", "images/GinPlaceHolder.jpg"]
+          //["beer", "images/BeerPlaceHolder.jpg"],
+          //["liquor", "images/LiquorPlaceHolder.jpg"],
+          //["whiskey", "images/WhiskeyPlaceHolder.jpg"],
+          //["vodka", "images/VodkaPlaceHolder.jpg"],
+          //["rum", "images/RumPlaceHolder.jpg"]
+        ]
+
+        const imgSrc =
+        (choices.find(([kw]) => cat.includes(kw))?.[1])
+        || "images/SpiritPlaceHolder.jpg";
 
         const card = document.createElement("div");
         card.classList.add("item");
@@ -88,6 +99,7 @@
             <a class="three-dots" href="editItem.html?id=${doc.id}">&#8942;</a>
             <div class="item-info">
               <h3>${data.productName}</h3>
+              <p>Stock: ${data.stock}</p>
             </div>
             <div class="item-details">
             <div>
@@ -97,9 +109,10 @@
                 <p><strong>Product ID:</strong> ${data.productID}</p>
             </div>
             <div>
-                <p><strong>Stock:</strong> ${data.stock}</p>
                 <p><strong>Reorder Level:</strong> ${data.reorderLevel}</p>
-                <p><strong>Selling Price:</strong> $${data.sellingPrice}</p>
+                <p><strong>Selling Price:</strong> $${data.sellingPrice.toFixed(2)}</p>
+                <p><strong>Cost Price:</strong> $${data.costPrice.toFixed(2)}</p>
+                <p><strong>Total Revenue:</strong> $${data.totalRevenue.toFixed(2)}</p>
             </div>
             </div>
         `;

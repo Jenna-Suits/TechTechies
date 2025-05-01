@@ -114,35 +114,37 @@
         }
 
         snap.forEach(doc => {
-          const item = doc.data();
-          const card = document.createElement("div");
-          card.classList.add("item");
-          card.innerHTML = `
+          const data = doc.data();
+
+        const cat = data.category?.toLowerCase() || "";
+        const imgSrc = cat.includes("wine")
+        ? "images/WinePlaceHolder.jpg"
+        : "images/SpiritPlaceHolder.jpg";
+
+        const card = document.createElement("div");
+        card.classList.add("item");
+        card.innerHTML = `
+           <img class="item-image" src="${imgSrc}" alt="${data.productName}" />
             <a class="three-dots" href="editItem.html?id=${doc.id}">&#8942;</a>
-            <img
-              src="${item.imageURL || 'https://via.placeholder.com/150'}"
-              alt="${item.productName}"
-              class="item-image"
-            />
             <div class="item-info">
-              <h3>${item.productName}</h3>
-              <p>Stock: ${item.stock}</p>
+              <h3>${data.productName}</h3>
+              <p>Stock: ${data.stock}</p>
             </div>
             <div class="item-details">
-              <div>
-                <p><strong>Brand:</strong> ${item.brand}</p>
-                <p><strong>Category:</strong> ${item.category}</p>
-                <p><strong>Expires:</strong> ${item.expirationDate}</p>
-                <p><strong>ID:</strong> ${item.productID}</p>
-              </div>
-              <div>
-                <p><strong>Reorder Level:</strong> ${item.reorderLevel}</p>
-                <p><strong>Selling Price:</strong> $${item.sellingPrice}</p>
-                <p><strong>Cost Price:</strong> $${item.costPrice}</p>
-                <p><strong>Total Revenue:</strong> $${item.totalRevenue}</p>
-              </div>
+            <div>
+                <p><strong>Brand:</strong> ${data.brand}</p>
+                <p><strong>Category:</strong> ${data.category}</p>
+                <p><strong>Expires:</strong> ${data.expirationDate}</p>
+                <p><strong>Product ID:</strong> ${data.productID}</p>
             </div>
-          `;
+            <div>
+                <p><strong>Reorder Level:</strong> ${data.reorderLevel}</p>
+                <p><strong>Selling Price:</strong> $${data.sellingPrice.toFixed(2)}</p>
+                <p><strong>Cost Price:</strong> $${data.costPrice.toFixed(2)}</p>
+                <p><strong>Total Revenue:</strong> $${data.totalRevenue.toFixed(2)}</p>
+            </div>
+            </div>
+        `;
           resultsContainer.appendChild(card);
         });
       } catch (err) {

@@ -97,15 +97,16 @@
 
         
         matches.forEach(item => {
+          const cat = item.category?.toLowerCase() || "";
+          const imgSrc = cat.includes("wine")
+          ? "images/WinePlaceHolder.jpg"
+          : "images/SpiritPlaceHolder.jpg";
+
           const card = document.createElement("div");
           card.classList.add("item");
           card.innerHTML = `
             <a class="three-dots" href="editItem.html?id=${item.id}">&#8942;</a>
-            <img
-              src="${item.imageURL || 'https://via.placeholder.com/150'}"
-              alt="${item.productName}"
-              class="item-image"
-            />
+            <img class="item-image" src="${imgSrc}" alt="${item.productName}" />
             <div class="item-info">
               <h3>${item.productName}</h3>
               <p>Stock: ${item.stock}</p>
@@ -119,9 +120,9 @@
               </div>
               <div>
                 <p><strong>Reorder Level:</strong> ${item.reorderLevel}</p>
-                <p><strong>Selling Price:</strong> $${item.sellingPrice}</p>
-                <p><strong>Cost Price:</strong> $${item.costPrice}</p>
-                <p><strong>Total Revenue:</strong> $${item.totalRevenue}</p>
+                <p><strong>Selling Price:</strong> $${item.sellingPrice.toFixed(2)}</p>
+                <p><strong>Cost Price:</strong> $${item.costPrice.toFixed(2)}</p>
+                <p><strong>Total Revenue:</strong> $${item.totalRevenue.toFixed(2)}</p>
               </div>
             </div>
           `;
