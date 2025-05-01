@@ -1,9 +1,9 @@
 # TechTechies
 
-# Project Name: Inventory Management System
+Project Name: Inventory Management System
 
-# Group Members: Rufta Atsgeba, Jenna Suits, Allisha Wilson, and Javier A. Arroyo-Solis
+Group Members: Rufta Atsgeba, Jenna Suits, Allisha Wilson, and Javier A. Arroyo-Solis
 
-# Description:
+Description:
 
-# Tools Used:
+Tools Used:
